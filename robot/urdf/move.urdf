@@ -6,7 +6,6 @@
                 <cylinder length="0.6" radius="0.25"/>
             </geometry>
         </visual>
-
         <collision>
             <geometry>
                 <cylinder length="0.6" radius="0.25"/>
@@ -25,7 +24,6 @@
                 <cylinder length="1" radius="0.1"/>
             </geometry>
         </visual>
-
         <collision>
             <geometry>
                 <cylinder length="1" radius="0.1"/>
