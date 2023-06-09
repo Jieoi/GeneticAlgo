@@ -1,4 +1,5 @@
 import numpy as np
+import copy
 
 class Genome():
     # static function -> 
@@ -40,3 +41,24 @@ class Genome():
 
         return gene_spec
 
+    @staticmethod
+    def expandLinks(parent_link, uniq_parent_name, flat_links, expanded_links):
+        children = [l for l in flat_links if l.parent_name == parent_link.name] #finding all links with parent name the same as parent link
+        
+        for c in children:
+            for r in range(c.recur):
+                c_copy = copy.copy(c) # need to know its uniq parent
+                c_copy.parent_name = uniq_parent_name
+                # make the name uniq by adding the len at current pos
+                # link in URDF need to be unique
+                uniq_name = c_copy.name + str(len(expanded_links))
+                c_copy.name = uniq_name
+                expanded_links.append(c_copy)
+                Genome.expandLinks(c, uniq_name, flat_links, expanded_links) #parent C, start from c
+
+
+class URDFLink:
+    def __init__(self, name, parent_name, recur):
+        self.name = name
+        self.parent_name = parent_name
+        self.recur = recur
