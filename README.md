@@ -5,3 +5,6 @@
 
 <h2>robot folder</h2>
 <p>Contains the urdf files created<p>
+  
+<h2>genome folder</h2>
+<p>Contains the genetic algorithm for training robot</p>
