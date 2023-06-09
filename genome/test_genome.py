@@ -34,6 +34,20 @@ class GenomeTest(unittest.TestCase):
     def testGeneSpecExist(self):
         spec = genome.Genome.get_gene_spec()
         self.assertIsNotNone(spec)
+    
+    def testGeneSpecHasLinkLength(self):
+        spec = genome.Genome.get_gene_spec()
+        self.assertIsNotNone(spec['link-length'])
+    
+    def testGeneSpecHasLinkID(self):
+        spec = genome.Genome.get_gene_spec()
+        print(spec)
+        self.assertIsNotNone(spec['link-length']['ind'])
+    
+    def testGeneSpecScale(self):
+        spec = genome.Genome.get_gene_spec()
+        gene = genome.Genome.get_random_gene(20)
+        self.assertGreater(gene[spec['link-length']['ind']],0)
 
 if __name__ == '__main__':
     unittest.main()
