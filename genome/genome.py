@@ -1,3 +1,4 @@
+#from xml.dom.minidom import getDOMImplementation
 import numpy as np
 import copy
 
@@ -44,9 +45,10 @@ class Genome():
     @staticmethod
     def expandLinks(parent_link, uniq_parent_name, flat_links, expanded_links):
         children = [l for l in flat_links if l.parent_name == parent_link.name] #finding all links with parent name the same as parent link
-        
+        # sibling_ind = 1
+
         for c in children:
-            for r in range(c.recur):
+            for r in range(int(c.recur)):
                 c_copy = copy.copy(c) # need to know its uniq parent
                 c_copy.parent_name = uniq_parent_name
                 # make the name uniq by adding the len at current pos
@@ -72,6 +74,7 @@ class Genome():
             gdicts.append(Genome.get_gene_dict(gene, spec))
         return gdicts
 
+    # Converts scaled and labelled genome data into URDFLink objects
     @staticmethod
     def genome_to_links(gdicts):
         links = []
@@ -89,7 +92,7 @@ class Genome():
             recur = gdict["link-recurrence"]
             link = URDFLink(name=link_name, 
                             parent_name=parent_name, 
-                            recur=recur + 1, # set recurrsion to at least 1, prevent recur of zero (no child)
+                            recur=recur+1, # set recurrsion to at least 1, prevent recur of zero (no child)
                             link_length=gdict["link-length"], 
                             link_radius=gdict["link-radius"], 
                             link_mass=gdict["link-mass"],
@@ -153,3 +156,8 @@ class URDFLink:
         self.control_amp = control_amp
         self.control_freq = control_freq
         self.sibling_ind = 1
+    
+    # stateful, depending on its own self.parameter
+    # dom generated in test/creature
+    def to_link_xml(self, adom):
+        return ""

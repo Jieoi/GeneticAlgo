@@ -1,6 +1,7 @@
 import unittest
 import genome
 import numpy as np
+from xml.dom.minidom import getDOMImplementation
 
 class GenomeTest(unittest.TestCase):
 
@@ -79,7 +80,6 @@ class GenomeTest(unittest.TestCase):
         gene_dict =genome.Genome.get_gene_dict(gene,spec)
         self.assertIn('link-recurrence', gene_dict.keys()) #first is the thing to be found
 
-
     def testGenomeToDict(self):
         spec =genome.Genome.get_gene_spec()
         # attr: len of gen and gene counts
@@ -96,6 +96,18 @@ class GenomeTest(unittest.TestCase):
         genome_dicts = genome.Genome.get_genome_dicts(dna, spec)
         links = genome.Genome.genome_to_links(genome_dicts)
         self.assertEqual(len(links),3)
+
+    def testLinkToXML(self):
+        link = genome.URDFLink(name="A",parent_name="None", recur=1)
+
+        domimpl = getDOMImplementation()
+        adom = domimpl.createDocument(None,"starter",None)
+
+        xml_str = link.to_link_xml(adom)
+
+        self.assertIsNotNone(xml_str)
+
+
 
 if __name__ == '__main__':
     unittest.main()
