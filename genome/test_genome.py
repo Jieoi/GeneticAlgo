@@ -72,7 +72,30 @@ class GenomeTest(unittest.TestCase):
         names = [l.name +'-parent is-' + str(l.parent_name) for l in exp_links]
         print(names)
         self.assertEqual(len(exp_links),6) #ABCDCD
+##
+    def testGeneToDeneDict_linkrec(self):
+        spec =genome.Genome.get_gene_spec()
+        gene = genome.Genome.get_random_gene(len(spec))
+        gene_dict =genome.Genome.get_gene_dict(gene,spec)
+        self.assertIn('link-recurrence', gene_dict.keys()) #first is the thing to be found
 
+
+    def testGenomeToDict(self):
+        spec =genome.Genome.get_gene_spec()
+        # attr: len of gen and gene counts
+        dna = genome.Genome.get_random_genome(len(spec),3)
+        # list of dict, each from each gene
+        genome_dicts = genome.Genome.get_genome_dicts(dna, spec)
+        self.assertEqual(len(genome_dicts),3)
+
+    def testGetLinks(self):
+        spec =genome.Genome.get_gene_spec()
+        # attr: len of gen and gene counts
+        dna = genome.Genome.get_random_genome(len(spec),3)
+        # list of dict, each from each gene
+        genome_dicts = genome.Genome.get_genome_dicts(dna, spec)
+        links = genome.Genome.genome_to_links(genome_dicts)
+        self.assertEqual(len(links),3)
 
 if __name__ == '__main__':
     unittest.main()
