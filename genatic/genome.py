@@ -1,4 +1,3 @@
-#from xml.dom.minidom import getDOMImplementation
 import numpy as np
 import copy
  
@@ -15,9 +14,8 @@ class Genome():
         genome = [Genome.get_random_gene(gene_length) for _ in range(gene_count)]
         return genome
 
-    @staticmethod
     def get_gene_spec():
-        gene_spec = {"link-shape":{"scale":1},
+        gene_spec =  {"link-shape":{"scale":1}, 
             "link-length": {"scale":1},
             "link-radius": {"scale":1},
             "link-recurrence": {"scale":4},
@@ -37,32 +35,16 @@ class Genome():
             }
         ind = 0
         for key in gene_spec.keys():
-            gene_spec[key]["ind"]=ind
+            gene_spec[key]["ind"] = ind
             ind = ind + 1
 
         return gene_spec
 
     @staticmethod
-    def expandLinks(parent_link, uniq_parent_name, flat_links, expanded_links):
-        children = [l for l in flat_links if l.parent_name == parent_link.name] #finding all links with parent name the same as parent link
-        # sibling_ind = 1
-
-        for c in children:
-            for r in range(int(c.recur)):
-                c_copy = copy.copy(c) # need to know its uniq parent
-                c_copy.parent_name = uniq_parent_name
-                # make the name uniq by adding the len at current pos
-                # link in URDF need to be unique
-                uniq_name = c_copy.name + str(len(expanded_links))
-                c_copy.name = uniq_name
-                expanded_links.append(c_copy)
-                Genome.expandLinks(c, uniq_name, flat_links, expanded_links) #parent C, start from c
-
-    @staticmethod
     def get_gene_dict(gene, spec):
         gdict = {}
         for key in spec:
-            ind = spec[key]['ind']
+            ind = spec[key]["ind"]
             scale = spec[key]["scale"]
             gdict[key] = gene[ind] * scale
         return gdict
@@ -73,6 +55,24 @@ class Genome():
         for gene in genome:
             gdicts.append(Genome.get_gene_dict(gene, spec))
         return gdicts
+
+    @staticmethod
+    def expandLinks(parent_link, uniq_parent_name, flat_links, exp_links):
+        children = [l for l in flat_links if l.parent_name == parent_link.name]
+        sibling_ind = 1
+        for c in children:
+            for r in range(int(c.recur)):
+                sibling_ind  = sibling_ind +1
+                c_copy = copy.copy(c) # need to know its uniq parent
+                c_copy.parent_name = uniq_parent_name
+                # make the name uniq by adding the len at current pos
+                uniq_name = c_copy.name + str(len(exp_links))
+                #print("exp: ", c.name, " -> ", uniq_name)
+                c_copy.name = uniq_name
+                c_copy.sibling_ind = sibling_ind
+                exp_links.append(c_copy)
+                assert c.parent_name != c.name, "Genome::expandLinks: link joined to itself: " + c.name + " joins " + c.parent_name 
+                Genome.expandLinks(c, uniq_name, flat_links, exp_links) #parent C, start from c
 
     # Converts scaled and labelled genome data into URDFLink objects
     @staticmethod
@@ -89,10 +89,11 @@ class Genome():
             parent_ind = gdict["joint-parent"] * len(parent_names)
             parent_name = parent_names[int(parent_ind)]
 
+            #print("available parents: ", parent_names, "chose", parent_name)
             recur = gdict["link-recurrence"]
             link = URDFLink(name=link_name, 
                             parent_name=parent_name, 
-                            recur=recur+1, # set recurrsion to at least 1, prevent recur of zero (no child)
+                            recur=recur+1,  # set recurrsion to at least 1, prevent recur of zero (no child)
                             link_length=gdict["link-length"], 
                             link_radius=gdict["link-radius"], 
                             link_mass=gdict["link-mass"],
@@ -112,66 +113,85 @@ class Genome():
             links.append(link)
 
             # link become avaliable parent name
-            if link_ind != 0: # don't re-add the first link
+            if link_ind != 0:# don't re-add the first link
                 parent_names.append(link_name)
             link_ind = link_ind + 1
 
         # now just fix the first link so it links to nothing
-        links[0].parent_name = "None" # set parent node to none for the root node
+        links[0].parent_name = "None"
         return links
+
 
 class URDFLink:
     def __init__(self, name, parent_name, recur, 
-                link_length = 0.1, 
-                link_radius = 0.1, 
-                link_mass = 0.1,
-                joint_type = 0.1,
-                joint_parent = 0.1,
-                joint_axis_xyz = 0.1,
-                joint_origin_rpy_1 = 0.1,
-                joint_origin_rpy_2 = 0.1,
-                joint_origin_rpy_3 = 0.1,
-                joint_origin_xyz_1 = 0.1,
-                joint_origin_xyz_2 = 0.1,
-                joint_origin_xyz_3 = 0.1,
-                control_waveform = 0.1,
-                control_amp = 0.1,
-                control_freq = 0.1):
+                link_length=0.1, 
+                link_radius=0.1, 
+                link_mass=0.1,
+                joint_type=0.1,
+                joint_parent=0.1,
+                joint_axis_xyz=0.1,
+                joint_origin_rpy_1=0.1,
+                joint_origin_rpy_2=0.1,
+                joint_origin_rpy_3=0.1,
+                joint_origin_xyz_1=0.1,
+                joint_origin_xyz_2=0.1,
+                joint_origin_xyz_3=0.1,
+                control_waveform=0.1,
+                control_amp=0.1,
+                control_freq=0.1):
         self.name = name
         self.parent_name = parent_name
         self.recur = recur 
-        self.link_length = link_length 
-        self.link_radius = link_radius
-        self.link_mass = link_mass
-        self.joint_type = joint_type
-        self.joint_parent = joint_parent
-        self.joint_axis_xyz = joint_axis_xyz
-        self.joint_origin_rpy_1 = joint_origin_rpy_1
-        self.joint_origin_rpy_2 = joint_origin_rpy_2
-        self.joint_origin_rpy_3 = joint_origin_rpy_3
-        self.joint_origin_xyz_1 = joint_origin_xyz_1
-        self.joint_origin_xyz_2 = joint_origin_xyz_2
-        self.joint_origin_xyz_3 = joint_origin_xyz_3
-        self.control_waveform = control_waveform
-        self.control_amp = control_amp
-        self.control_freq = control_freq
-        # self.sibling_ind = 1
+        self.link_length=link_length 
+        self.link_radius=link_radius
+        self.link_mass=link_mass
+        self.joint_type=joint_type
+        self.joint_parent=joint_parent
+        self.joint_axis_xyz=joint_axis_xyz
+        self.joint_origin_rpy_1=joint_origin_rpy_1
+        self.joint_origin_rpy_2=joint_origin_rpy_2
+        self.joint_origin_rpy_3=joint_origin_rpy_3
+        self.joint_origin_xyz_1=joint_origin_xyz_1
+        self.joint_origin_xyz_2=joint_origin_xyz_2
+        self.joint_origin_xyz_3=joint_origin_xyz_3
+        self.control_waveform=control_waveform
+        self.control_amp=control_amp
+        self.control_freq=control_freq
+        self.sibling_ind = 1
     
     # stateful, depending on its own self.parameter
     # dom generated in test/creature
     def to_link_element(self, adom):
+        #         <link name="base_link">
+        #     <visual>
+        #       <geometry>
+        #         <cylinder length="0.6" radius="0.25"/>
+        #       </geometry>
+        #     </visual>
+        #     <collision>
+        #       <geometry>
+        #         <cylinder length="0.6" radius="0.25"/>
+        #       </geometry>
+        #     </collision>
+        #     <inertial>
+        # 	    <mass value="0.25"/>
+        # 	    <inertia ixx="0.0003" iyy="0.0003" izz="0.0003" ixy="0" ixz="0" iyz="0"/>
+        #     </inertial>
+        #   </link>
+  
         link_tag = adom.createElement("link")
-        link_tag.setAttribute('name',self.name)
+        link_tag.setAttribute("name", self.name)
         vis_tag = adom.createElement("visual")
         geom_tag = adom.createElement("geometry")
         cyl_tag = adom.createElement("cylinder")
-        # variation 
-        cyl_tag.setAttribute("length",str(self.link_length))
-        cyl_tag.setAttribute("radius",str(self.link_radius))
-
+        # variation
+        cyl_tag.setAttribute("length", str(self.link_length))
+        cyl_tag.setAttribute("radius", str(self.link_radius))
+        
         geom_tag.appendChild(cyl_tag)
         vis_tag.appendChild(geom_tag)
-
+        
+        
         coll_tag = adom.createElement("collision")
         c_geom_tag = adom.createElement("geometry")
         c_cyl_tag = adom.createElement("cylinder")
@@ -180,12 +200,16 @@ class URDFLink:
         
         c_geom_tag.appendChild(c_cyl_tag)
         coll_tag.appendChild(c_geom_tag)
-
+        
+        #     <inertial>
+        # 	    <mass value="0.25"/>
+        # 	    <inertia ixx="0.0003" iyy="0.0003" izz="0.0003" ixy="0" ixz="0" iyz="0"/>
+        #     </inertial>
         inertial_tag = adom.createElement("inertial")
         mass_tag = adom.createElement("mass")
-
         # mass dependent on volume
         # genome parameter
+        # pi r^2 * height
         mass = np.pi * (self.link_radius * self.link_radius) * self.link_length
         mass_tag.setAttribute("value", str(mass))
         inertia_tag = adom.createElement("inertia")
@@ -198,10 +222,12 @@ class URDFLink:
         inertia_tag.setAttribute("iyx", "0")
         inertial_tag.appendChild(mass_tag)
         inertial_tag.appendChild(inertia_tag)
+        
 
-        geom_tag.appendChild(cyl_tag)
-        vis_tag.appendChild(geom_tag)
         link_tag.appendChild(vis_tag)
+        link_tag.appendChild(coll_tag)
+        link_tag.appendChild(inertial_tag)
+        
         return link_tag
 
     def to_joint_element(self, adom):
@@ -213,22 +239,22 @@ class URDFLink:
         #     <origin rpy="0 0 0" xyz="0 0.5 0"/>
         #   </joint>
         joint_tag = adom.createElement("joint")
-        # name for the joint
+        # name of the joint
         joint_tag.setAttribute("name", self.name + "_to_" + self.parent_name)
-        # allow both joint type
+        # set joint type
         if self.joint_type >= 0.5:
             joint_tag.setAttribute("type", "revolute")
         else:
-            joint_tag.setAttribute("type", "fixed")
-
-        # genetically encoded parents and child  
+            joint_tag.setAttribute("type", "revolute")
+        
+        # genetically encoded parents and child
         parent_tag = adom.createElement("parent")
         parent_tag.setAttribute("link", self.parent_name)
         child_tag = adom.createElement("child")
         child_tag.setAttribute("link", self.name)
         axis_tag = adom.createElement("axis")
 
-        # placement of link relative to parent (how it rotate in revolute joint)
+        # placement of link relative to parent (rotate in revolute joint)
         if self.joint_axis_xyz <= 0.33:
             axis_tag.setAttribute("xyz", "1 0 0")
         if self.joint_axis_xyz > 0.33 and self.joint_axis_xyz <= 0.66:
@@ -242,16 +268,16 @@ class URDFLink:
         limit_tag.setAttribute("upper", "-3.1415")
         limit_tag.setAttribute("lower", "3.1415")
         limit_tag.setAttribute("velocity", "1")
-
-        # # placement of link relative to parent (where is it placed relative to parents)
         # <origin rpy="0 0 0" xyz="0 0.5 0"/>
+        # placement of link relative to parent (where is it placed relative to parents)
         orig_tag = adom.createElement("origin")
-        rpy =str(self.joint_origin_rpy_2) + " " + str(self.joint_origin_rpy_3)
+        
+        rpy1 = self.joint_origin_rpy_1 * self.sibling_ind
+
+        rpy = str(rpy1) + " " + str(self.joint_origin_rpy_2) + " " + str(self.joint_origin_rpy_3)
         orig_tag.setAttribute("rpy", rpy)
         xyz = str(self.joint_origin_xyz_1) + " " + str(self.joint_origin_xyz_2) + " " + str(self.joint_origin_xyz_3)
         orig_tag.setAttribute("xyz", xyz)
-
-        # rpy1 = self.joint_origin_rpy_1 * self.sibling_ind   str(rpy1) + " " + 
 
         joint_tag.appendChild(parent_tag)
         joint_tag.appendChild(child_tag)

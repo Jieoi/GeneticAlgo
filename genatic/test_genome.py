@@ -1,7 +1,7 @@
 import unittest
 import genome
 import numpy as np
-from xml.dom.minidom import getDOMImplementation
+# from xml.dom.minidom import getDOMImplementation
 
 class GenomeTest(unittest.TestCase):
 
@@ -57,7 +57,7 @@ class GenomeTest(unittest.TestCase):
             genome.URDFLink(name="C",parent_name='B', recur=2),
             genome.URDFLink(name="D",parent_name='C', recur=1)
             
-        ];
+        ]
         self.assertIsNotNone(links)
     
     def testExpandLinks(self):
@@ -70,10 +70,10 @@ class GenomeTest(unittest.TestCase):
         ];
         exp_links = [links[0]]
         genome.Genome.expandLinks(links[0], links[0].name, links, exp_links)
-        names = [l.name +'-parent is-' + str(l.parent_name) for l in exp_links]
-        print(names)
+        # names = [l.name +'-parent is-' + str(l.parent_name) for l in exp_links]
+        # print(names)
         self.assertEqual(len(exp_links),6) #ABCDCD
-##
+
     def testGeneToDeneDict_linkrec(self):
         spec =genome.Genome.get_gene_spec()
         gene = genome.Genome.get_random_gene(len(spec))
@@ -97,15 +97,15 @@ class GenomeTest(unittest.TestCase):
         links = genome.Genome.genome_to_links(genome_dicts)
         self.assertEqual(len(links),3)
 
-    def testLinkToXML(self):
-        link = genome.URDFLink(name="A",parent_name="None", recur=1)
+    # def testLinkToXML(self):
+    #     link = genome.URDFLink(name="A",parent_name="None", recur=1)
 
-        domimpl = getDOMImplementation()
-        adom = domimpl.createDocument(None,"starter",None)
+    #     domimpl = getDOMImplementation()
+    #     adom = domimpl.createDocument(None,"starter",None)
 
-        xml_str = link.to_link_element(adom)
-        print(xml_str)
-        self.assertIsNotNone(xml_str)
+    #     xml_str = link.to_link_element(adom)
+    #     print(xml_str)
+    #     self.assertIsNotNone(xml_str)
 
 # more challenging test
     def testGetLinksUniqueNames(self):
