@@ -103,10 +103,22 @@ class GenomeTest(unittest.TestCase):
         domimpl = getDOMImplementation()
         adom = domimpl.createDocument(None,"starter",None)
 
-        xml_str = link.to_link_xml(adom)
-
+        xml_str = link.to_link_element(adom)
+        print(xml_str)
         self.assertIsNotNone(xml_str)
 
+# more challenging test
+    def testGetLinksUniqueNames(self):
+        spec = genome.Genome.get_gene_spec()
+        dna = genome.Genome.get_random_genome(len(spec), 3)
+        gdicts = genome.Genome.get_genome_dicts(dna, spec)
+        links = genome.Genome.genome_to_links(gdicts)
+        # check that each link's name only appears once
+        for l in links:
+            names = [link.name for
+                link in links
+                if link.name == l.name]
+            self.assertEqual(len(names), 1)
 
 
 if __name__ == '__main__':
