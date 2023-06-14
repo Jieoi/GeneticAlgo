@@ -50,7 +50,8 @@ class TestCreature(unittest.TestCase):
         # hard codes some links
         links = [
             genome.URDFLink(name="A",parent_name=None, recur = 1),
-            genome.URDFLink(name="B",parent_name='A', recur = 2,joint_origin_rpy_1=0.75, link_length=1.0),
+            # test for multiple children/sibling
+            genome.URDFLink(name="B",parent_name='A', recur = 6, joint_origin_rpy_1=0.75, link_length=1.0),
         ]
         c = creature.Creature(gene_count = 2)
         c.flat_links = links
@@ -59,5 +60,26 @@ class TestCreature(unittest.TestCase):
         with open('103.urdf', 'w') as f:
             f.write('<?xml version="1.0"?>' + "\n" + xml_str)
 
+#motor
+    def testMotor(self):
+        m = creature.Motor(0.1,0.5,0.5)
+        self.assertIsNotNone(m)
+    
+    def testMotorValPulse(self):
+        m = creature.Motor(0.1,0.5,0.5)
+        self.assertEqual(m.get_output(),1)
+
+    def testMotorValSine(self):
+        m = creature.Motor(0.6,0.5,0.5)
+        m.get_output()
+        m.get_output()
+        m.get_output()
+        self.assertGreater(m.get_output(),0)
+    
+    def testCMot(self):
+        c = creature.Creature(gene_count = 4)
+        ls = c.get_expanded_links()
+        ms = c.get_motors()
+        self.assertEqual(len(ls)-1, len(ms))
 
 unittest.main()

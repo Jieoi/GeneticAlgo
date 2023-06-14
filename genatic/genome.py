@@ -20,6 +20,7 @@ class Genome():
             "link-radius": {"scale":1},
             "link-recurrence": {"scale":4},
             "link-mass": {"scale":1},
+            # joints
             "joint-type": {"scale":1},
             "joint-parent":{"scale":1},
             "joint-axis-xyz": {"scale":1},
@@ -29,6 +30,7 @@ class Genome():
             "joint-origin-xyz-1":{"scale":1},
             "joint-origin-xyz-2":{"scale":1},
             "joint-origin-xyz-3":{"scale":1},
+            # motor
             "control-waveform":{"scale":1},
             "control-amp":{"scale":0.25},
             "control-freq":{"scale":1}
@@ -59,15 +61,17 @@ class Genome():
     @staticmethod
     def expandLinks(parent_link, uniq_parent_name, flat_links, exp_links):
         children = [l for l in flat_links if l.parent_name == parent_link.name]
+        # initialise the sibling index
         sibling_ind = 1
         for c in children:
             for r in range(int(c.recur)):
+                # create new sibling when repeated on same parent
                 sibling_ind  = sibling_ind +1
                 c_copy = copy.copy(c) # need to know its uniq parent
                 c_copy.parent_name = uniq_parent_name
+                
                 # make the name uniq by adding the len at current pos
                 uniq_name = c_copy.name + str(len(exp_links))
-                #print("exp: ", c.name, " -> ", uniq_name)
                 c_copy.name = uniq_name
                 c_copy.sibling_ind = sibling_ind
                 exp_links.append(c_copy)
@@ -145,6 +149,7 @@ class URDFLink:
         self.link_length=link_length 
         self.link_radius=link_radius
         self.link_mass=link_mass
+        # joints
         self.joint_type=joint_type
         self.joint_parent=joint_parent
         self.joint_axis_xyz=joint_axis_xyz
@@ -154,31 +159,17 @@ class URDFLink:
         self.joint_origin_xyz_1=joint_origin_xyz_1
         self.joint_origin_xyz_2=joint_origin_xyz_2
         self.joint_origin_xyz_3=joint_origin_xyz_3
+        # motor
         self.control_waveform=control_waveform
         self.control_amp=control_amp
         self.control_freq=control_freq
+        # solve the problem of overlapping
+        # higher number, higher rotation
         self.sibling_ind = 1
     
     # stateful, depending on its own self.parameter
     # dom generated in test/creature
     def to_link_element(self, adom):
-        #         <link name="base_link">
-        #     <visual>
-        #       <geometry>
-        #         <cylinder length="0.6" radius="0.25"/>
-        #       </geometry>
-        #     </visual>
-        #     <collision>
-        #       <geometry>
-        #         <cylinder length="0.6" radius="0.25"/>
-        #       </geometry>
-        #     </collision>
-        #     <inertial>
-        # 	    <mass value="0.25"/>
-        # 	    <inertia ixx="0.0003" iyy="0.0003" izz="0.0003" ixy="0" ixz="0" iyz="0"/>
-        #     </inertial>
-        #   </link>
-  
         link_tag = adom.createElement("link")
         link_tag.setAttribute("name", self.name)
         vis_tag = adom.createElement("visual")
@@ -201,10 +192,7 @@ class URDFLink:
         c_geom_tag.appendChild(c_cyl_tag)
         coll_tag.appendChild(c_geom_tag)
         
-        #     <inertial>
-        # 	    <mass value="0.25"/>
-        # 	    <inertia ixx="0.0003" iyy="0.0003" izz="0.0003" ixy="0" ixz="0" iyz="0"/>
-        #     </inertial>
+        # inertial
         inertial_tag = adom.createElement("inertial")
         mass_tag = adom.createElement("mass")
         # mass dependent on volume
@@ -231,13 +219,7 @@ class URDFLink:
         return link_tag
 
     def to_joint_element(self, adom):
-        #           <joint name="base_to_sub2" type="revolute">
-        #     <parent link="base_link"/>
-        #     <child link="sub_link2"/>
-        #     <axis xyz="1 0 0"/>
-        #     <limit effort="10" upper="0" lower="10" velocity="1"/>
-        #     <origin rpy="0 0 0" xyz="0 0.5 0"/>
-        #   </joint>
+        # joint tage
         joint_tag = adom.createElement("joint")
         # name of the joint
         joint_tag.setAttribute("name", self.name + "_to_" + self.parent_name)
@@ -254,7 +236,7 @@ class URDFLink:
         child_tag.setAttribute("link", self.name)
         axis_tag = adom.createElement("axis")
 
-        # placement of link relative to parent (rotate in revolute joint)
+        # relative position of link to parent (rotate in revolute joint)
         if self.joint_axis_xyz <= 0.33:
             axis_tag.setAttribute("xyz", "1 0 0")
         if self.joint_axis_xyz > 0.33 and self.joint_axis_xyz <= 0.66:
@@ -269,9 +251,10 @@ class URDFLink:
         limit_tag.setAttribute("lower", "3.1415")
         limit_tag.setAttribute("velocity", "1")
         # <origin rpy="0 0 0" xyz="0 0.5 0"/>
-        # placement of link relative to parent (where is it placed relative to parents)
+        # relative position of link to parent (where is it placed relative to parents)
         orig_tag = adom.createElement("origin")
         
+        # times the sibling id to increase the rotation
         rpy1 = self.joint_origin_rpy_1 * self.sibling_ind
 
         rpy = str(rpy1) + " " + str(self.joint_origin_rpy_2) + " " + str(self.joint_origin_rpy_3)

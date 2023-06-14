@@ -1,7 +1,6 @@
 import unittest
 import genome
 import numpy as np
-# from xml.dom.minidom import getDOMImplementation
 
 class GenomeTest(unittest.TestCase):
 
@@ -70,6 +69,7 @@ class GenomeTest(unittest.TestCase):
         ];
         exp_links = [links[0]]
         genome.Genome.expandLinks(links[0], links[0].name, links, exp_links)
+        # test code for the parents:
         # names = [l.name +'-parent is-' + str(l.parent_name) for l in exp_links]
         # print(names)
         self.assertEqual(len(exp_links),6) #ABCDCD
@@ -96,16 +96,6 @@ class GenomeTest(unittest.TestCase):
         genome_dicts = genome.Genome.get_genome_dicts(dna, spec)
         links = genome.Genome.genome_to_links(genome_dicts)
         self.assertEqual(len(links),3)
-
-    # def testLinkToXML(self):
-    #     link = genome.URDFLink(name="A",parent_name="None", recur=1)
-
-    #     domimpl = getDOMImplementation()
-    #     adom = domimpl.createDocument(None,"starter",None)
-
-    #     xml_str = link.to_link_element(adom)
-    #     print(xml_str)
-    #     self.assertIsNotNone(xml_str)
 
 # more challenging test
     def testGetLinksUniqueNames(self):

@@ -48,6 +48,70 @@
 			<inertia ixx="0.03" iyy="0.03" izz="0.03" ixy="0" ixz="0" iyx="0"/>
 		</inertial>
 	</link>
+	<link name="B3">
+		<visual>
+			<geometry>
+				<cylinder length="1.0" radius="0.1"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<cylinder length="1.0" radius="0.1"/>
+			</geometry>
+		</collision>
+		<inertial>
+			<mass value="0.031415926535897934"/>
+			<inertia ixx="0.03" iyy="0.03" izz="0.03" ixy="0" ixz="0" iyx="0"/>
+		</inertial>
+	</link>
+	<link name="B4">
+		<visual>
+			<geometry>
+				<cylinder length="1.0" radius="0.1"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<cylinder length="1.0" radius="0.1"/>
+			</geometry>
+		</collision>
+		<inertial>
+			<mass value="0.031415926535897934"/>
+			<inertia ixx="0.03" iyy="0.03" izz="0.03" ixy="0" ixz="0" iyx="0"/>
+		</inertial>
+	</link>
+	<link name="B5">
+		<visual>
+			<geometry>
+				<cylinder length="1.0" radius="0.1"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<cylinder length="1.0" radius="0.1"/>
+			</geometry>
+		</collision>
+		<inertial>
+			<mass value="0.031415926535897934"/>
+			<inertia ixx="0.03" iyy="0.03" izz="0.03" ixy="0" ixz="0" iyx="0"/>
+		</inertial>
+	</link>
+	<link name="B6">
+		<visual>
+			<geometry>
+				<cylinder length="1.0" radius="0.1"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<cylinder length="1.0" radius="0.1"/>
+			</geometry>
+		</collision>
+		<inertial>
+			<mass value="0.031415926535897934"/>
+			<inertia ixx="0.03" iyy="0.03" izz="0.03" ixy="0" ixz="0" iyx="0"/>
+		</inertial>
+	</link>
 	<joint name="B1_to_A" type="revolute">
 		<parent link="A"/>
 		<child link="B1"/>
@@ -61,5 +125,33 @@
 		<axis xyz="1 0 0"/>
 		<limit effort="1" upper="-3.1415" lower="3.1415" velocity="1"/>
 		<origin rpy="2.25 0.1 0.1" xyz="0.1 0.1 0.1"/>
+	</joint>
+	<joint name="B3_to_A" type="revolute">
+		<parent link="A"/>
+		<child link="B3"/>
+		<axis xyz="1 0 0"/>
+		<limit effort="1" upper="-3.1415" lower="3.1415" velocity="1"/>
+		<origin rpy="3.0 0.1 0.1" xyz="0.1 0.1 0.1"/>
+	</joint>
+	<joint name="B4_to_A" type="revolute">
+		<parent link="A"/>
+		<child link="B4"/>
+		<axis xyz="1 0 0"/>
+		<limit effort="1" upper="-3.1415" lower="3.1415" velocity="1"/>
+		<origin rpy="3.75 0.1 0.1" xyz="0.1 0.1 0.1"/>
+	</joint>
+	<joint name="B5_to_A" type="revolute">
+		<parent link="A"/>
+		<child link="B5"/>
+		<axis xyz="1 0 0"/>
+		<limit effort="1" upper="-3.1415" lower="3.1415" velocity="1"/>
+		<origin rpy="4.5 0.1 0.1" xyz="0.1 0.1 0.1"/>
+	</joint>
+	<joint name="B6_to_A" type="revolute">
+		<parent link="A"/>
+		<child link="B6"/>
+		<axis xyz="1 0 0"/>
+		<limit effort="1" upper="-3.1415" lower="3.1415" velocity="1"/>
+		<origin rpy="5.25 0.1 0.1" xyz="0.1 0.1 0.1"/>
 	</joint>
 </robot>

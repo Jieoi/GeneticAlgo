@@ -1,5 +1,36 @@
 import genome
 from xml.dom.minidom import getDOMImplementation
+from enum import Enum
+import numpy as np
+
+class MotorType(Enum):
+    PULSE = 1
+    SINE = 2
+
+class Motor:
+    def __init__(self, control_waveform, control_amp, control_freq):
+        if control_waveform <= 0.5:
+            self.motor_type = MotorType.PULSE
+        else:
+            self.motor_type = MotorType.SINE
+        self.amp = control_amp
+        self.freq = control_freq
+        self.phase = 0
+
+    # output from the motor(set up and update speed of motor)
+    def get_output(self):
+        # phase modulo 2 pi to ensure it loops around 2pi
+        self.phase = (self.phase + self.freq) % (np.pi * 2)
+        if self.motor_type == MotorType.PULSE:
+            if self.phase < np.pi:
+                output = 1 # set at 1 for 0-pi
+            else: 
+                output = -1 # set at -1 for pi-2pi
+        if self.motor_type == MotorType.SINE:
+            output = np.sin(self.phase)
+        
+        return output 
+
 
 class Creature:
     def __init__(self, gene_count):
@@ -11,8 +42,8 @@ class Creature:
         self.flat_links = None
         # set expanded link to None at the start
         self.exp_links = None
-
-
+        # set no motors at the start
+        self.motors = None
     
     # convert dna into a set of flat link using genome
     def get_flat_links(self):
@@ -57,3 +88,18 @@ class Creature:
             robot_tag.appendChild(link.to_joint_element(adom))
         robot_tag.setAttribute("name", "pepe") # choose a name!
         return robot_tag.toprettyxml()
+    
+    def get_motors(self):
+        # one less motor than the links
+        self.get_expanded_links()
+        # assert(self.exp_links != None), "creature: call get_exp_links before get_motor"
+        if self.motors == None:
+            motors = []
+            for i in range(1, len(self.exp_links)):
+                l = self.exp_links[i]
+                m = Motor(l.control_waveform,l.control_amp,l.control_freq)
+                motors.append(m)
+            self.motors = motors
+        return self.motors
+
+
