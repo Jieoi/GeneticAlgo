@@ -44,6 +44,12 @@ class Creature:
         self.exp_links = None
         # set no motors at the start
         self.motors = None
+        # make creature ready to use
+        self.get_flat_links()
+        self.get_expanded_links()
+        # set start and last position to None
+        self.start_position = None
+        self.last_position = None
     
     # convert dna into a set of flat link using genome
     def get_flat_links(self):
@@ -86,7 +92,7 @@ class Creature:
                 first = False
                 continue
             robot_tag.appendChild(link.to_joint_element(adom))
-        robot_tag.setAttribute("name", "pepe") # choose a name!
+        robot_tag.setAttribute("name", "jiejie") # choose a name!
         return robot_tag.toprettyxml()
     
     def get_motors(self):
@@ -102,4 +108,20 @@ class Creature:
             self.motors = motors
         return self.motors
 
+    def update_position(self, pos):
+        # set start position to the pos at the start
+        # or set as the last position
+        # use to calculate the distance moved
+        if self.start_position ==None:
+            self.start_position = pos
+        else:
+            self.last_position = pos
+
+
+    def get_distance_travelled(self):
+        p1 = np.array(self.start_position)
+        p2 = np.array(self.last_position)
+
+        # get distance between p1 and p2
+        return np.linalg.norm(p1-p2)
 
