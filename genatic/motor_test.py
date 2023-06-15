@@ -28,6 +28,11 @@ cid = p.loadURDF('test.urdf')
 # set real time simulation to true
 p.setRealTimeSimulation(1)
 
+# set the original position to be origin
+c.update_position([0,0,0])
+
+# set position to slightly above ground level at origin
+p.resetBasePositionAndOrientation(cid, [0,0,3],[0,0,0,1])
 # infinite loop to iterate
 while True:
     for jid in range(p.getNumJoints(cid)):
@@ -37,4 +42,7 @@ while True:
             controlMode = p.VELOCITY_CONTROL,
             targetVelocity = m.get_output(),
             force = 5)
+    pos, orn = p.getBasePositionAndOrientation(cid)
+    c.update_position([pos])
+    print(c.get_distance_travelled())
     time.sleep(0.1) # update the motor every 0.1 sec

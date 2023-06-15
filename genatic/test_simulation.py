@@ -2,6 +2,7 @@ import unittest
 import simulation
 import creature
 import os
+import population
 
 class TestSim(unittest.TestCase):
     # check if the simulation exists
@@ -35,4 +36,25 @@ class TestSim(unittest.TestCase):
         # print(cr.start_position, cr.last_position)
         self.assertNotEqual(cr.start_position, cr.last_position)
 
+    # check if the robot is travalling
+    def testDitsance(self):
+        sim = simulation.Simulation()
+        cr = creature.Creature(gene_count = 3)
+        sim.run_creature(cr)
+        dist = cr.get_distance_travelled()
+        print(dist)
+        self.assertGreater(dist, 0)
+    
+    # check the population exists
+    def testPop(self):
+        pop = population.Population(pop_size = 10, gene_count=3)
+        sim = simulation.Simulation()
+        for cr in pop.creatures:
+            sim.run_creature(cr)
+        dists = [cr.get_distance_travelled() for cr in pop.creatures]
+        print(dists)
+        self.assertIsNotNone(dists)
+
 unittest.main()
+
+# eng divide distance by motor for fairness or competition?

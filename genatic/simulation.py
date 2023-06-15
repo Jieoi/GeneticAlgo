@@ -11,11 +11,22 @@ class Simulation():
         pid = self.physicsClientId
         p.resetSimulation(physicsClientId = pid)
         p.setGravity(0,0,-10, physicsClientId = pid)
+        # prevent caching
+        p.setPhysicsEngineParameter(enableFileCaching=0, physicsClientId = pid)
+
+        # set a floor
+        plane_shape = p.createCollisionShape(p.GEOM_PLANE, physicsClientId=pid)
+        floor = p.createMultiBody(plane_shape, plane_shape, physicsClientId=pid)
+
+        # setting for the xml file
         xml_file = 'temp.urdf'
         xml_str = cr.to_xml()
         with open(xml_file, 'w') as f:
             f.write(xml_str)
         cid = p.loadURDF(xml_file,physicsClientId=pid)
+        
+        # set position to slightly above ground level at origin
+        p.resetBasePositionAndOrientation(cid, [0,0,3],[0,0,0,1],physicsClientId=pid)
         for step in range(iterations):
             p.stepSimulation(physicsClientId=pid)
             if step % 24 == 0:
@@ -24,6 +35,9 @@ class Simulation():
             # built in function for getting pos and orn
             pos, orn = p.getBasePositionAndOrientation(cid,physicsClientId=pid)
             cr.update_position(pos)
+            # if step > 0:
+            #     print(cr.last_position[2])
+
 
 
     def update_motors(self, cid,cr):
