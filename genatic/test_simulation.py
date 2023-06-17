@@ -47,10 +47,19 @@ class TestSim(unittest.TestCase):
     
     # check the population exists
     def testPop(self):
-        pop = population.Population(pop_size = 10, gene_count=3)
+        pop = population.Population(pop_size = 5, gene_count=3)
         sim = simulation.Simulation()
         for cr in pop.creatures:
             sim.run_creature(cr)
+        dists = [cr.get_distance_travelled() for cr in pop.creatures]
+        print(dists)
+        self.assertIsNotNone(dists)
+
+    # multi threaded not working
+    def testProcNoThread(self):
+        pop = population.Population(pop_size=20, gene_count=3)
+        sim = simulation.Simulation()
+        sim.eval_population(pop, 2400)
         dists = [cr.get_distance_travelled() for cr in pop.creatures]
         print(dists)
         self.assertIsNotNone(dists)
