@@ -55,7 +55,7 @@ class TestSim(unittest.TestCase):
         print(dists)
         self.assertIsNotNone(dists)
 
-    # multi threaded not working
+    # multi threaded not working, testing without it
     def testProcNoThread(self):
         pop = population.Population(pop_size=20, gene_count=3)
         sim = simulation.Simulation()

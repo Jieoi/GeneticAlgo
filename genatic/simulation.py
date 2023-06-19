@@ -1,5 +1,5 @@
 import pybullet as p
-from multiprocessing import Pool
+#from multiprocessing import Pool
 
 class Simulation():
     # Creates a physics engine as far as possible without GUI
