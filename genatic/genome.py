@@ -1,5 +1,6 @@
 import numpy as np
 import copy
+import random
  
 class Genome():
     # static function -> 
@@ -128,29 +129,39 @@ class Genome():
     # Crossover
     @staticmethod
     def crossover(g1, g2):
-        xo = np.random.randint(len(g1))
-        if xo > len(g2):
-            xo = len(g2) - 1
-
-        g3 = np.concatenate((g1[0:xo], g2[xo:]))
+        '''
+        g1 and g2 are raw dna data - list of list of floats
+        '''
+        x1 = random.randint(0, len(g1)-1)
+        x2 = random.randint(0, len(g2)-1)
+        g3 = np.concatenate((g1[x1:], g2[x2:])) 
+        if len(g3) > len(g1):
+            g3 = g3[0:len(g1)] 
         return g3
     
     # Point mutation
     @staticmethod
-    def point_mutation(genes, rate, amount):
-        for gene in genes:
-            if np.random.rand() < rate:
-                ind = np.random.randint(len(gene))
-                r = (np.random.rand() -0.5) * amount
-                gene[ind] = gene[ind] + r
+    def point_mutation(genome, rate, amount):
+        new_genome = copy.copy(genome)
+        for gene in new_genome:
+            for i in range(len(gene)):
+                if random.random() < rate:
+                    gene[i] += 0.1
+                if gene[i] >= 1.0:
+                    gene[i] = 0.9999
+                if gene[i] < 0.0:
+                    gene[i] = 0.0
+        return new_genome
     
     # Shrink mutation (Remove gene)
     @staticmethod
-    def shrink_mutation(gene, rate):
+    def shrink_mutation(genes, rate):
+        if len(genes) == 1:
+            return copy.copy(genes)
         if np.random.rand() < rate:
             # randomly remove the gene by ind
-            ind = np.random.randint(len(gene))
-            genes = np.delete(gene, ind, 0)
+            ind = np.random.randint(len(genes))
+            genes = np.delete(genes, ind, 0)
         return genes
     
     # Grow mutation (add gene)
@@ -161,7 +172,17 @@ class Genome():
             genes = np.append(genes, [gene], axis = 0)
         return genes
 
+    # save dna to csv
+    @staticmethod
+    def to_csv(dna, csv_file):
+        csv_str = ""
+        for gene in dna:
+            for val in gene:
+                csv_str = csv_str + str(val) + ","
+            csv_str = csv_str + '\n'
 
+        with open(csv_file, 'w') as f:
+            f.write(csv_str)
 
 
 
