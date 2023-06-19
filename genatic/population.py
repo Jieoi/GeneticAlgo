@@ -6,6 +6,8 @@ class Population():
         self.creatures = [creature.Creature(gene_count=gene_count) for i in range(pop_size)]
 
     # Roulette wheel selection of the creatures for next genertion
+    # generate a float between 0 and 1, works out which 
+    # interval it's in and selects the appropriate parent
     @staticmethod
     def get_fitness_map(fits):
         fitmap = []

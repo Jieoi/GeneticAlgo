@@ -125,6 +125,45 @@ class Genome():
         links[0].parent_name = "None"
         return links
 
+    # Crossover
+    @staticmethod
+    def crossover(g1, g2):
+        xo = np.random.randint(len(g1))
+        if xo > len(g2):
+            xo = len(g2) - 1
+
+        g3 = np.concatenate((g1[0:xo], g2[xo:]))
+        return g3
+    
+    # Point mutation
+    @staticmethod
+    def point_mutation(genes, rate, amount):
+        for gene in genes:
+            if np.random.rand() < rate:
+                ind = np.random.randint(len(gene))
+                r = (np.random.rand() -0.5) * amount
+                gene[ind] = gene[ind] + r
+    
+    # Shrink mutation (Remove gene)
+    @staticmethod
+    def shrink_mutation(gene, rate):
+        if np.random.rand() < rate:
+            # randomly remove the gene by ind
+            ind = np.random.randint(len(gene))
+            genes = np.delete(gene, ind, 0)
+        return genes
+    
+    # Grow mutation (add gene)
+    @staticmethod
+    def grow_mutation(genes, rate):
+        if np.random.rand() < rate:
+            gene = Genome.get_random_gene(len(genes[0]))
+            genes = np.append(genes, [gene], axis = 0)
+        return genes
+
+
+
+
 
 class URDFLink:
     def __init__(self, name, parent_name, recur, 
