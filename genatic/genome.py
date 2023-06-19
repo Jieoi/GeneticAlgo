@@ -184,6 +184,21 @@ class Genome():
         with open(csv_file, 'w') as f:
             f.write(csv_str)
 
+    # read dna from csv and split it in end of lines(,)
+    @staticmethod
+    def from_csv(filename):
+        csv_str = ''
+        with open(filename) as f:
+            csv_str = f.read()   
+        dna = []
+        lines = csv_str.split('\n')
+        for line in lines:
+            vals = line.split(',')
+            gene = [float(v) for v in vals if v != '']
+            if len(gene) > 0:
+                dna.append(gene)
+        return dna
+
 
 
 class URDFLink:

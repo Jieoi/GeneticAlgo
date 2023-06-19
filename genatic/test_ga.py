@@ -1,5 +1,5 @@
 #overall test for the genetic algorithm
-
+# NOTE: NO MULTI THREADING
 import unittest
 import population as poplib
 import simulation as simlib
@@ -50,16 +50,12 @@ class TestGA(unittest.TestCase):
             for cr in pop.creatures:
                 if cr.get_distance_travelled() == fmax:
                     elite = cr
+                    elite.set_dna(cr.dna)
                     new_creatures[0] = elite
+                    csv_filename = str(iteration) + "_elite.csv"
+                    gnlib.Genome.to_csv(elite.dna, csv_filename)
                     break
-
-            #         new_cr = creature.Creature(1)
-            #         new_cr.update_dna(cr.dna)
-            #         new_creatures[0] = new_cr
-            #         filename = "elite_"+str(iteration)+".csv"
-            #         gnlib.Genome.to_csv(cr.dna, filename)
-            #         break
-            
+           
             # replace creature with prev gen with new ones
             pop.creatures = new_creatures
                             
