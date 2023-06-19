@@ -50,23 +50,27 @@ class Creature:
         # set start and last position to None
         self.start_position = None
         self.last_position = None
+        # set distance to be 0 for fitness function
+        self.dist = 0
     
     # regenerate the links and joints
     def set_dna(self,dna):
         # get gene
         self.dna = dna
-        # set flat link to None at the start
+        # reset flat link to None at the start
         self.flat_links = None
-        # set expanded link to None at the start
+        # reset expanded link to None at the start
         self.exp_links = None
-        # set no motors at the start
+        # reset no motors at the start
         self.motors = None
-        # make creature ready to use
+        # remake creature ready to use
         self.get_flat_links()
         self.get_expanded_links()
-        # set start and last position to None
+        # reset start and last position to None
         self.start_position = None
         self.last_position = None
+        # reset distance to be 0 for fitness function
+        self.dist = 0
 
     # convert dna into a set of flat link using genome
     def get_flat_links(self):
@@ -126,6 +130,12 @@ class Creature:
         return self.motors
 
     def update_position(self, pos):
+        # calcuate the distance travelled since last position update
+        if self.last_position !=None:
+            p1 = np.array(self.last_position)
+            p2 = np.array(pos)
+            dist = np.linalg.norm(p1-p2)
+            self.dist = self.dist + dist
         # set start position to the pos at the start
         # or set as the last position
         # use to calculate the distance moved
@@ -135,11 +145,9 @@ class Creature:
             self.last_position = pos
 
     def get_distance_travelled(self):
-        p1 = np.array(self.start_position)
-        p2 = np.array(self.last_position)
-
         # get distance between p1 and p2
-        return np.linalg.norm(p1-p2)
+        # update: calculated in self.dist in update_position
+        return self.dist
 
     def update_dna(self, dna):
         self.dna = dna

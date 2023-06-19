@@ -28,6 +28,7 @@ class TestGA(unittest.TestCase):
                     for cr in pop.creatures]
             print(iteration, "fittest:", np.round(np.max(fits), 3), "mean:", np.round(np.mean(fits), 3), "mean links", np.round(np.mean(links)), "max links", np.round(np.max(links)))       
             fit_map = poplib.Population.get_fitness_map(fits)
+            
             new_creatures = []
             for i in range(len(pop.creatures)):
                 p1_ind = poplib.Population.select_parent(fit_map)
@@ -43,10 +44,15 @@ class TestGA(unittest.TestCase):
                 cr = creature.Creature(1)
                 cr.set_dna(dna)
                 new_creatures.append(cr)
-            # # elitism
-            # max_fit = np.max(fits)
-            # for cr in pop.creatures:
-            #     if cr.get_distance_travelled() == max_fit:
+                       
+            # elitism: Retaining the fittest individuals from each generation without changing them
+            fmax = np.max(fits)
+            for cr in pop.creatures:
+                if cr.get_distance_travelled() == fmax:
+                    elite = cr
+                    new_creatures[0] = elite
+                    break
+
             #         new_cr = creature.Creature(1)
             #         new_cr.update_dna(cr.dna)
             #         new_creatures[0] = new_cr
