@@ -10,7 +10,7 @@ class Simulation():
     def run_creature(self, cr,iterations=2400):
         #running at 240 iteration per sec in GUI 
         # (10 sec of simulation)
-        pid = self.physicsClientId
+        self.pid = self.physicsClientId
         p.resetSimulation(physicsClientId = pid)
         p.setGravity(0,0,-10, physicsClientId = pid)
         # prevent caching
