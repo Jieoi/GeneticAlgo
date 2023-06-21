@@ -3,7 +3,6 @@
 import unittest
 import population as poplib
 import simulation as simlib
-import creature as crlib
 import genome as gnlib
 import creature
 
@@ -19,7 +18,7 @@ class TestGA(unittest.TestCase):
         sim = simlib.Simulation()
 
         # call run creature to test instead of eval_population
-        for iteration in range(10):
+        for iteration in range(100):
             for cr in pop.creatures:
                 sim.run_creature(cr, 2400)            
             fits = [cr.get_distance_travelled() 
